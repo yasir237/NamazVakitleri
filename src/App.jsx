@@ -1,5 +1,17 @@
+import Prayer from './components/prayer';
 
 function App() {
+
+  const cities = [
+    { id: 20, name: "Ankara" },
+    { id: 34, name: "İstanbul" },
+    { id: 35, name: "İzmir" },
+    { id: 6, name: "Bursa" },
+    { id: 41, name: "Kocaeli" },
+    { id: 7, name: "Konya" },
+    { id: 16, name: "Bursa" },
+  ]
+  
 
   return (
     <section>
@@ -9,8 +21,9 @@ function App() {
             <h3>Şehir</h3>
 
             <select name="" id="">
-              <option value={20}> Ankara </option>
-              <option value={20}> İstanbul </option>
+              {cities.map((city) => (
+                <option key={city.id} value={city.id}>{city.name}</option>
+              ))}
             </select>
           </div>
 
@@ -21,37 +34,13 @@ function App() {
 
         </div >
 
-        <div>
-          <div className='prayer'>
-            <p className='name_prayer'>İmsak</p>
-            <p className='time_prayer'>03:52</p>
-          </div>
+          <Prayer name="İmsak" time="03:52" />
+          <Prayer name="Güneş" time="05:31" />
+          <Prayer name="Öğle" time="12:49" />
+          <Prayer name="İkindi" time="16:40" />
+          <Prayer name="Akşam" time="19:54" />
+          <Prayer name="Yatsı" time="21:27" />
 
-          <div className='prayer'>
-            <p className='name_prayer'>Güneş</p>
-            <p className='time_prayer'>05:31</p>
-          </div>
-
-          <div className='prayer'>
-            <p className='name_prayer'>Öğle</p>
-            <p className='time_prayer'>12:49</p>
-          </div>
-
-          <div className='prayer'>
-            <p className='name_prayer'>İkindi</p>
-            <p className='time_prayer'>16:40</p>
-          </div>
-
-          <div className='prayer'>
-            <p className='name_prayer'>Akşam</p>
-            <p className='time_prayer'>19:54</p>
-          </div>
-
-          <div className='prayer'>
-            <p className='name_prayer'>Yatsı</p>
-            <p className='time_prayer'>21:27</p>
-          </div>
-        </div>
       </div>
     </section>
   )
