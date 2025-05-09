@@ -6,6 +6,9 @@ function App() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [time, setTime] = useState("");
   const [nextPrayerInfo, setNextPrayerInfo] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("Konum bilgisi alınıyor...");
+  const [error, setError] = useState(null);
 
 
   const turkishCities = [
@@ -92,29 +95,94 @@ function App() {
     { id: 81, name: "Düzce", latitude: 40.8438, longitude: 31.1565 }
   ];
 
+  // Kullanıcının konumunu alıp en yakın şehri bulan fonksiyon
+  const findNearestCity = (userLat, userLng) => {
+    let nearestCity = null;
+    let minDistance = Infinity;
+
+    // Haversine formülü ile iki nokta arasındaki mesafeyi hesaplama
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+      const R = 6371; // Dünya yarıçapı km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    };
+
+    // En yakın şehri bul
+    turkishCities.forEach(city => {
+      const distance = calculateDistance(userLat, userLng, city.latitude, city.longitude);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCity = city;
+      }
+    });
+
+    return nearestCity;
+  };
+
+  // Sayfa yüklendiğinde konum bilgisini al
+  useEffect(() => {
+    const getUserLocation = () => {
+      setLoadingMessage("Konum bilgisi alınıyor...");
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const nearest = findNearestCity(latitude, longitude);
+            setSelectedCity(nearest);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Konum alınamadı:", error);
+            setError("Konum izni verilmedi veya konum alınamadı. Lütfen manuel olarak bir şehir seçin.");
+            setLoading(false);
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      } else {
+        setError("Tarayıcınız konum hizmetlerini desteklemiyor. Lütfen manuel olarak bir şehir seçin.");
+        setLoading(false);
+      }
+    };
+
+    getUserLocation();
+  }, []);
+
+  // Seçilen şehre göre namaz vakitlerini al
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       if (!selectedCity) return;
+
+      setLoadingMessage("Namaz vakitleri alınıyor...");
+      setLoading(true);
 
       const today = new Date();
       const month = today.getMonth() + 1;
       const year = today.getFullYear();
       const day = today.getDate();
-      const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
       try {
         const response = await fetch(`https://api.aladhan.com/v1/calendar?latitude=${selectedCity.latitude}&longitude=${selectedCity.longitude}&method=13&month=${month}&year=${year}`);
         const data_prayer = await response.json();
         const todayData = data_prayer.data[day - 1].timings;
         setPrayerTimes(todayData);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching prayer times:", error);
+        setError("Namaz vakitleri alınamadı. Lütfen tekrar deneyin.");
+        setLoading(false);
       }
     };
 
     fetchPrayerTimes();
   }, [selectedCity]);
 
+  // Saat ve sonraki namaz vaktine kadar kalan süreyi güncelle
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -131,12 +199,11 @@ function App() {
     return () => clearInterval(interval);
   }, [prayerTimes]);
 
-  
+  // Sonraki namaz vaktine kalan süreyi hesapla
   const getTimeUntilNextPrayer = () => {
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-   
     const prayerTimesObj = {
       "İmsak": prayerTimes?.Fajr?.split(" ")[0],
       "Güneş": prayerTimes?.Sunrise?.split(" ")[0],
@@ -146,7 +213,6 @@ function App() {
       "Yatsı": prayerTimes?.Isha?.split(" ")[0]
     };
 
-    
     const prayerTimesWithNames = Object.entries(prayerTimesObj).map(([name, timeStr]) => {
       if (!timeStr) return { name, minutes: Infinity };
 
@@ -157,7 +223,6 @@ function App() {
       };
     });
 
-    
     const nextPrayer = prayerTimesWithNames
       .filter(prayer => prayer.minutes > nowMinutes)
       .sort((a, b) => a.minutes - b.minutes)[0];
@@ -175,40 +240,103 @@ function App() {
   return (
     <section>
       <div className="container">
-        <div className="top_sec">
-          <div className="col">
-            <div className="city">
-              <h3>Şehir</h3>
-              <select onChange={(e) => {
-                const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
-                setSelectedCity(selectedCity);
-              }}>
-                <option value="">Şehir Seçin</option>
-                {turkishCities.map((city) => (
-                  <option key={city.id} value={city.id}>{city.name}</option>
-                ))}
-              </select>
+        {loading ? (
+          <div className="loading">
+            <div className="top_sec">
+              <div className="col">
+                <div className="city">
+                  <h3>Şehir</h3>
+                  <select disabled>
+                    <option>Yükleniyor...</option>
+                  </select>
+                </div>
+                <div className="date">
+                  <h3>Tarih</h3>
+                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                </div>
+              </div>
+              <div className="info">
+                <h4>{loadingMessage}</h4>
+              </div>
             </div>
-            <div className="date">
-              <h3>Tarih</h3>
-              <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+            
+            <Prayer name="İmsak" time="--:--" />
+            <Prayer name="Güneş" time="--:--" />
+            <Prayer name="Öğle" time="--:--" />
+            <Prayer name="İkindi" time="--:--" />
+            <Prayer name="Akşam" time="--:--" />
+            <Prayer name="Yatsı" time="--:--" />
+          </div>
+        ) : error ? (
+          <>
+            <div className="top_sec">
+              <div className="col">
+                <div className="city">
+                  <h3>Şehir</h3>
+                  <select onChange={(e) => {
+                    const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
+                    setSelectedCity(selectedCity);
+                  }}>
+                    <option value="">Şehir Seçin</option>
+                    {turkishCities.map((city) => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="date">
+                  <h3>Tarih</h3>
+                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                </div>
+              </div>
+              <div className="info">
+                <h4>{error}</h4>
+              </div>
             </div>
-          </div>
-          <div className="info">
-            <h4>{nextPrayerInfo}</h4>
-          </div>
-        </div>
+            
+            <Prayer name="İmsak" time="--:--" />
+            <Prayer name="Güneş" time="--:--" />
+            <Prayer name="Öğle" time="--:--" />
+            <Prayer name="İkindi" time="--:--" />
+            <Prayer name="Akşam" time="--:--" />
+            <Prayer name="Yatsı" time="--:--" />
+          </>
+        ) : (
+          <>
+            <div className="top_sec">
+              <div className="col">
+                <div className="city">
+                  <h3>Şehir</h3>
+                  <select 
+                    value={selectedCity?.id || ""} 
+                    onChange={(e) => {
+                      const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
+                      setSelectedCity(selectedCity);
+                    }}
+                  >
+                    <option value="">Şehir Seçin</option>
+                    {turkishCities.map((city) => (
+                      <option key={city.id} value={city.id}>{city.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="date">
+                  <h3>Tarih</h3>
+                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                </div>
+              </div>
+              <div className="info">
+                <h4>{nextPrayerInfo}</h4>
+              </div>
+            </div>
 
-
-
-
-
-        <Prayer name="İmsak" time={prayerTimes?.Fajr} />
-        <Prayer name="Güneş" time={prayerTimes?.Sunrise} />
-        <Prayer name="Öğle" time={prayerTimes?.Dhuhr} />
-        <Prayer name="İkindi" time={prayerTimes?.Asr} />
-        <Prayer name="Akşam" time={prayerTimes?.Maghrib} />
-        <Prayer name="Yatsı" time={prayerTimes?.Isha} />
+            <Prayer name="İmsak" time={prayerTimes?.Fajr ? String(prayerTimes?.Fajr).split(' ')[0] : ""} />
+            <Prayer name="Güneş" time={prayerTimes?.Sunrise ? String(prayerTimes?.Sunrise).split(' ')[0] : ""} />
+            <Prayer name="Öğle" time={prayerTimes?.Dhuhr ? String(prayerTimes?.Dhuhr).split(' ')[0] : ""} />
+            <Prayer name="İkindi" time={prayerTimes?.Asr ? String(prayerTimes?.Asr).split(' ')[0] : ""} />
+            <Prayer name="Akşam" time={prayerTimes?.Maghrib ? String(prayerTimes?.Maghrib).split(' ')[0] : ""} />
+            <Prayer name="Yatsı" time={prayerTimes?.Isha ? String(prayerTimes?.Isha).split(' ')[0] : ""} />
+          </>
+        )}
       </div>
     </section>
   );
