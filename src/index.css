@@ -43,12 +43,14 @@ section .container {
 }
 
 section .top_sec {
-  display: flex;
-  justify-content: space-between;
+  padding: 10px;
   align-items: center;
-  padding-bottom: 40px;
   margin-bottom: 40px;
   border: 1px solid var(--border-color);
+}
+section .top_sec .col{
+   display: flex;
+   justify-content: space-between;
 }
 
 section .top_sec select {
@@ -75,6 +77,14 @@ section .top_sec .date h4 {
   font-size: var(--heading-font-size);
   color: var(--main-color);
 }
+section .top_sec .info h4 {
+  font-size: 16px;
+  color: var(--main-color);
+}
+
+.section .noborder{
+  border: none !important;
+}
 
 section .prayer {
   display: flex;
@@ -89,3 +99,4 @@ section .prayer {
   border: 1px solid var(--border-color);
 
 }
+

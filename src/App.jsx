@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Prayer from './components/prayer';
+
 function App() {
-
-
-  const [paryerTimes, setPrayerTimes] = useState({});
+  const [prayerTimes, setPrayerTimes] = useState({});
   const [selectedCity, setSelectedCity] = useState(null);
+  const [time, setTime] = useState("");
+  const [nextPrayerInfo, setNextPrayerInfo] = useState("");
+
 
   const turkishCities = [
     { id: 1, name: "Adana", latitude: 37.0, longitude: 35.3213 },
@@ -90,71 +92,126 @@ function App() {
     { id: 81, name: "Düzce", latitude: 40.8438, longitude: 31.1565 }
   ];
 
-
-
-
-
-
   useEffect(() => {
     const fetchPrayerTimes = async () => {
       if (!selectedCity) return;
 
       const today = new Date();
-      const month = today.getMonth() + 1; // JS'de aylar 0 tabanlıdır
+      const month = today.getMonth() + 1;
       const year = today.getFullYear();
       const day = today.getDate();
+      const prayerNames = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
       try {
         const response = await fetch(`https://api.aladhan.com/v1/calendar?latitude=${selectedCity.latitude}&longitude=${selectedCity.longitude}&method=13&month=${month}&year=${year}`);
         const data_prayer = await response.json();
-
         const todayData = data_prayer.data[day - 1].timings;
         setPrayerTimes(todayData);
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Error fetching prayer times:", error);
       }
-    }
+    };
 
     fetchPrayerTimes();
   }, [selectedCity]);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const hour = now.getHours().toString().padStart(2, '0');
+      const min = now.getMinutes().toString().padStart(2, '0');
+      const formattedTime = `${hour}:${min}`;
+      setTime(formattedTime);
+
+      if (Object.keys(prayerTimes).length > 0) {
+        setNextPrayerInfo(getTimeUntilNextPrayer());
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [prayerTimes]);
+
+  
+  const getTimeUntilNextPrayer = () => {
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+   
+    const prayerTimesObj = {
+      "İmsak": prayerTimes?.Fajr?.split(" ")[0],
+      "Güneş": prayerTimes?.Sunrise?.split(" ")[0],
+      "Öğle": prayerTimes?.Dhuhr?.split(" ")[0],
+      "İkindi": prayerTimes?.Asr?.split(" ")[0],
+      "Akşam": prayerTimes?.Maghrib?.split(" ")[0],
+      "Yatsı": prayerTimes?.Isha?.split(" ")[0]
+    };
+
+    
+    const prayerTimesWithNames = Object.entries(prayerTimesObj).map(([name, timeStr]) => {
+      if (!timeStr) return { name, minutes: Infinity };
+
+      const [hour, minute] = timeStr.split(':').map(Number);
+      return {
+        name,
+        minutes: hour * 60 + minute
+      };
+    });
+
+    
+    const nextPrayer = prayerTimesWithNames
+      .filter(prayer => prayer.minutes > nowMinutes)
+      .sort((a, b) => a.minutes - b.minutes)[0];
+
+    if (nextPrayer && nextPrayer.minutes !== Infinity) {
+      const remainingMinutes = nextPrayer.minutes - nowMinutes;
+      const hoursLeft = Math.floor(remainingMinutes / 60);
+      const minutesLeft = remainingMinutes % 60;
+      return `${nextPrayer.name} namazına ${hoursLeft} saat ${minutesLeft} dakika kaldı`;
+    } else {
+      return "Bugünkü tüm namaz vakitleri geçti";
+    }
+  };
 
   return (
     <section>
       <div className="container">
         <div className="top_sec">
-          <div className="city">
-            <h3>Şehir</h3>
-
-            <select name="" id="" onChange={(e) => {
-              const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
-              setSelectedCity(selectedCity);
-            }}>
-              <option value="">Şehir Seçin</option>
-              {turkishCities.map((city) => (
-                <option key={city.id} value={city.id}>{city.name}</option>
-              ))}
-            </select>
+          <div className="col">
+            <div className="city">
+              <h3>Şehir</h3>
+              <select onChange={(e) => {
+                const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
+                setSelectedCity(selectedCity);
+              }}>
+                <option value="">Şehir Seçin</option>
+                {turkishCities.map((city) => (
+                  <option key={city.id} value={city.id}>{city.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="date">
+              <h3>Tarih</h3>
+              <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+            </div>
           </div>
-
-          <div className="date">
-            <h3>Tarih</h3>
-            <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+          <div className="info">
+            <h4>{nextPrayerInfo}</h4>
           </div>
+        </div>
 
-        </div >
 
-        <Prayer name="İmsak" time={paryerTimes?.Fajr} />
-        <Prayer name="Güneş" time={paryerTimes?.Sunrise} />
-        <Prayer name="Öğle" time={paryerTimes?.Dhuhr} />
-        <Prayer name="İkindi" time={paryerTimes?.Asr} />
-        <Prayer name="Akşam" time={paryerTimes?.Maghrib} />
-        <Prayer name="Yatsı" time={paryerTimes?.Isha} />
 
+
+
+        <Prayer name="İmsak" time={prayerTimes?.Fajr} />
+        <Prayer name="Güneş" time={prayerTimes?.Sunrise} />
+        <Prayer name="Öğle" time={prayerTimes?.Dhuhr} />
+        <Prayer name="İkindi" time={prayerTimes?.Asr} />
+        <Prayer name="Akşam" time={prayerTimes?.Maghrib} />
+        <Prayer name="Yatsı" time={prayerTimes?.Isha} />
       </div>
     </section>
-  )
+  );
 }
 
-export default App
+export default App;
