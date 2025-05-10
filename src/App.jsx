@@ -195,6 +195,7 @@ function App() {
 
         const todayData = data_prayer.data[day - 1].timings;
         setPrayerTimes(todayData);
+        document.title = `Zikra - ${selectedCity.name} Namaz Vakitleri`;
         setLoading(false);
       } catch (error) {
         console.error("Error fetching prayer times:", error);

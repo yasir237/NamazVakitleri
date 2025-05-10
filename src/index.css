@@ -32,7 +32,7 @@ body {
 }
 
 section {
-   position: relative;
+  position: relative;
   background: url('assets/bg.png');
   background-size: cover;
   background-position: center;
@@ -45,7 +45,7 @@ section {
 
 /* Logo Stillemesi */
 .app-logo {
- position: absolute;
+  position: absolute;
   bottom: 20px;
   left: 20px;
   z-index: 1;
@@ -56,6 +56,7 @@ section {
   height: auto;
   filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
 }
+
 section .containers {
   display: flex;
 
@@ -156,7 +157,7 @@ section .prayer {
 
   section .container {
     padding: 15px 10px;
-            margin-bottom: 100px;
+    margin-bottom: 100px;
   }
 
   section .top_sec {
@@ -255,7 +256,7 @@ section .prayer:nth-child(6) {
 
 
 .ayet-container {
-   width: 100%;
+  width: 100%;
   max-width: 650px;
   padding: 20px 15px;
   margin: 0 auto;
@@ -266,16 +267,18 @@ section .prayer:nth-child(6) {
 
 .ayet-text {
   font-size: 48px;
-  font-family: 'Scheherazade', 'Amiri', serif; /* Kur’anî yazılar için güzel fontlar */
-  color: #1f2937; 
+  font-family: 'Scheherazade', 'Amiri', serif;
+  /* Kur’anî yazılar için güzel fontlar */
+  color: #1f2937;
   line-height: 1.8;
   text-align: center;
 }
 
 .ayet-turksh {
   font-size: 18px;
-  font-family: 'Noto Serif', serif; /* Kur’anî yazılar için güzel fontlar */
-  color: #1f2937; 
+  font-family: 'Noto Serif', serif;
+  /* Kur’anî yazılar için güzel fontlar */
+  color: #1f2937;
   line-height: 1.8;
   text-align: center;
 }
@@ -283,6 +286,6 @@ section .prayer:nth-child(6) {
 .ayet-reference {
   margin-top: 12px;
   font-size: 14px;
-  color: #5c342a75; 
+  color: #5c342a75;
   font-style: italic;
 }
