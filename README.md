@@ -6,6 +6,18 @@ Zikra, konuma göre dinamik namaz vakitlerini gösteren minimalist bir web uygul
   <img src = 'https://github.com/user-attachments/assets/7bce345d-5e96-4753-9897-15e3a846e698' width=50% >
 </div>
 
+## 🚀 Başlangıç
+Zikra, GitHub üzerinden erişime açık, aşağıdaki bağlantıdan uygulamayı canlı olarak görebilirsiniz
+
+👉 [Zikra Namaz Vakitleri Uygulaması](https://yasir237.github.io/Zikra-NamazVakitleri/)
+
+  veya
+
+👉 [https://yasir237.github.io/Zikra-NamazVakitleri/](https://yasir237.github.io/Zikra-NamazVakitleri/)
+
+---
+
+
 ## 🚀 Özellikler
 
 - 📍 Şehre göre dinamik namaz vakitleri
