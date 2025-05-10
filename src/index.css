@@ -253,6 +253,7 @@ section .prayer:nth-child(6) {
   font-family: 'Scheherazade', 'Amiri', serif; /* Kur’anî yazılar için güzel fontlar */
   color: #1f2937; 
   line-height: 1.8;
+  text-align: center;
 }
 
 .ayet-turksh {
@@ -266,6 +267,6 @@ section .prayer:nth-child(6) {
 .ayet-reference {
   margin-top: 12px;
   font-size: 14px;
-  color: #5c342a75; /* açık gri */
+  color: #5c342a75; 
   font-style: italic;
 }

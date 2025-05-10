@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Prayer from './components/prayer';
+import Ayet from './components/Ayet';
 
 function App() {
   const [prayerTimes, setPrayerTimes] = useState({});
@@ -379,12 +380,8 @@ function App() {
           )}
         </div>
 
-    <div class="ayet-container">
-  <p class="ayet-text">﴿ فَذَكِّرْ إِنَّمَا أَنتَ مُذَكِّرٌ ﴾</p>
-  <p class="ayet-turksh">﴿ Öğüt ver, çünkü sen ancak öğüt verensin ﴾</p>
-  <p class="ayet-reference">Gâşiye Suresi, 21</p>
-</div>
-
+          <Ayet arapca={"قُلْ يَا عِبَادِيَ الَّذ۪ينَ اَسْرَفُوا عَلٰٓى اَنْفُسِهِمْ لَا تَقْنَطُوا مِنْ رَحْمَةِ اللّٰهِۜ اِنَّ اللّٰهَ يَغْفِرُ الذُّنُوبَ جَم۪يعاًۜ اِنَّهُ هُوَ الْغَفُورُ الرَّح۪يمُ"} turkce={"Öğüt ver, çünkü sen ancak öğüt verensin"} reference={"Gâşiye Suresi, 21"} />
+      
       </div>
     </section>
   );
