@@ -141,17 +141,30 @@ function App() {
             console.error("Konum alınamadı:", error);
             setError("Konum izni verilmedi veya konum alınamadı. Lütfen manuel olarak bir şehir seçin.");
             setLoading(false);
+            // Varsayılan olarak İstanbul'u seç
+            const istanbul = turkishCities.find(city => city.id === 34);
+            setSelectedCity(istanbul);
           },
           { timeout: 10000, enableHighAccuracy: true }
         );
       } else {
         setError("Tarayıcınız konum hizmetlerini desteklemiyor. Lütfen manuel olarak bir şehir seçin.");
         setLoading(false);
+        // Varsayılan olarak İstanbul'u seç
+        const istanbul = turkishCities.find(city => city.id === 34);
+        setSelectedCity(istanbul);
       }
     };
 
     getUserLocation();
   }, []);
+
+  // Şehir seçildiğinde error durumunu temizle
+  useEffect(() => {
+    if (selectedCity) {
+      setError(null);
+    }
+  }, [selectedCity]);
 
   // Seçilen şehre göre namaz vakitlerini al
   useEffect(() => {
@@ -168,7 +181,17 @@ function App() {
 
       try {
         const response = await fetch(`https://api.aladhan.com/v1/calendar?latitude=${selectedCity.latitude}&longitude=${selectedCity.longitude}&method=13&month=${month}&year=${year}`);
+        
+        if (!response.ok) {
+          throw new Error(`API yanıt vermedi: ${response.status}`);
+        }
+        
         const data_prayer = await response.json();
+        
+        if (!data_prayer.data || !data_prayer.data[day - 1] || !data_prayer.data[day - 1].timings) {
+          throw new Error("API'den geçerli veri alınamadı");
+        }
+        
         const todayData = data_prayer.data[day - 1].timings;
         setPrayerTimes(todayData);
         setLoading(false);
@@ -237,6 +260,19 @@ function App() {
     }
   };
 
+  // Şehir seçimi değişikliği için yeni fonksiyon
+  const handleCityChange = (e) => {
+    const cityId = parseInt(e.target.value);
+    if (cityId) {
+      const selectedCity = turkishCities.find(c => c.id === cityId);
+      setSelectedCity(selectedCity);
+      // Error durumunu temizle
+      setError(null);
+    } else {
+      setSelectedCity(null);
+    }
+  };
+
   return (
     <section>
       <div className="container">
@@ -260,12 +296,14 @@ function App() {
               </div>
             </div>
             
-            <Prayer name="İmsak" time="--:--" />
-            <Prayer name="Güneş" time="--:--" />
-            <Prayer name="Öğle" time="--:--" />
-            <Prayer name="İkindi" time="--:--" />
-            <Prayer name="Akşam" time="--:--" />
-            <Prayer name="Yatsı" time="--:--" />
+            <div className="prayer-times">
+              <Prayer name="İmsak" time="--:--" />
+              <Prayer name="Güneş" time="--:--" />
+              <Prayer name="Öğle" time="--:--" />
+              <Prayer name="İkindi" time="--:--" />
+              <Prayer name="Akşam" time="--:--" />
+              <Prayer name="Yatsı" time="--:--" />
+            </div>
           </div>
         ) : error ? (
           <>
@@ -273,10 +311,10 @@ function App() {
               <div className="col">
                 <div className="city">
                   <h3>Şehir</h3>
-                  <select onChange={(e) => {
-                    const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
-                    setSelectedCity(selectedCity);
-                  }}>
+                  <select 
+                    value={selectedCity?.id || ""} 
+                    onChange={handleCityChange}
+                  >
                     <option value="">Şehir Seçin</option>
                     {turkishCities.map((city) => (
                       <option key={city.id} value={city.id}>{city.name}</option>
@@ -293,12 +331,14 @@ function App() {
               </div>
             </div>
             
-            <Prayer name="İmsak" time="--:--" />
-            <Prayer name="Güneş" time="--:--" />
-            <Prayer name="Öğle" time="--:--" />
-            <Prayer name="İkindi" time="--:--" />
-            <Prayer name="Akşam" time="--:--" />
-            <Prayer name="Yatsı" time="--:--" />
+            <div className="prayer-times">
+              <Prayer name="İmsak" time="--:--" />
+              <Prayer name="Güneş" time="--:--" />
+              <Prayer name="Öğle" time="--:--" />
+              <Prayer name="İkindi" time="--:--" />
+              <Prayer name="Akşam" time="--:--" />
+              <Prayer name="Yatsı" time="--:--" />
+            </div>
           </>
         ) : (
           <>
@@ -308,10 +348,7 @@ function App() {
                   <h3>Şehir</h3>
                   <select 
                     value={selectedCity?.id || ""} 
-                    onChange={(e) => {
-                      const selectedCity = turkishCities.find(c => c.id === parseInt(e.target.value));
-                      setSelectedCity(selectedCity);
-                    }}
+                    onChange={handleCityChange}
                   >
                     <option value="">Şehir Seçin</option>
                     {turkishCities.map((city) => (
@@ -329,12 +366,14 @@ function App() {
               </div>
             </div>
 
-            <Prayer name="İmsak" time={prayerTimes?.Fajr ? String(prayerTimes?.Fajr).split(' ')[0] : ""} />
-            <Prayer name="Güneş" time={prayerTimes?.Sunrise ? String(prayerTimes?.Sunrise).split(' ')[0] : ""} />
-            <Prayer name="Öğle" time={prayerTimes?.Dhuhr ? String(prayerTimes?.Dhuhr).split(' ')[0] : ""} />
-            <Prayer name="İkindi" time={prayerTimes?.Asr ? String(prayerTimes?.Asr).split(' ')[0] : ""} />
-            <Prayer name="Akşam" time={prayerTimes?.Maghrib ? String(prayerTimes?.Maghrib).split(' ')[0] : ""} />
-            <Prayer name="Yatsı" time={prayerTimes?.Isha ? String(prayerTimes?.Isha).split(' ')[0] : ""} />
+            <div className="prayer-times">
+              <Prayer name="İmsak" time={prayerTimes?.Fajr ? String(prayerTimes?.Fajr).split(' ')[0] : ""} />
+              <Prayer name="Güneş" time={prayerTimes?.Sunrise ? String(prayerTimes?.Sunrise).split(' ')[0] : ""} />
+              <Prayer name="Öğle" time={prayerTimes?.Dhuhr ? String(prayerTimes?.Dhuhr).split(' ')[0] : ""} />
+              <Prayer name="İkindi" time={prayerTimes?.Asr ? String(prayerTimes?.Asr).split(' ')[0] : ""} />
+              <Prayer name="Akşam" time={prayerTimes?.Maghrib ? String(prayerTimes?.Maghrib).split(' ')[0] : ""} />
+              <Prayer name="Yatsı" time={prayerTimes?.Isha ? String(prayerTimes?.Isha).split(' ')[0] : ""} />
+            </div>
           </>
         )}
       </div>
