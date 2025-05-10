@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri&family=Scheherazade&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif&display=swap');
 
 :root {
   --font-family-main: "Cairo", sans-serif;
@@ -38,6 +40,12 @@ section {
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+section .containers {
+  display: flex;
+
+  width: 100%;
 }
 
 section .container {
@@ -127,31 +135,35 @@ section .prayer {
   section {
     padding: 10px;
   }
-  
+
+  section .containers {
+    flex-direction: column-reverse;
+  }
+
   section .container {
     padding: 15px 10px;
   }
-  
+
   section .top_sec {
     padding: 8px;
   }
-  
+
   section .top_sec h3 {
     font-size: 18px;
   }
-  
+
   section .top_sec select {
     font-size: 16px;
   }
-  
+
   section .top_sec .date h4 {
     font-size: 16px;
   }
-  
+
   section .top_sec .info h4 {
     font-size: 14px;
   }
-  
+
   section .prayer {
     padding: 10px;
     font-size: 18px;
@@ -166,9 +178,17 @@ section .prayer {
 
 /* Animation for loading state */
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .loading .prayer {
@@ -177,8 +197,15 @@ section .prayer {
 
 /* Add swipe animation for prayer times */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 section .prayer {
@@ -186,10 +213,59 @@ section .prayer {
   animation-delay: calc(var(--i, 0) * 0.1s);
 }
 
-section .prayer:nth-child(1) { --i: 1; }
-section .prayer:nth-child(2) { --i: 2; }
-section .prayer:nth-child(3) { --i: 3; }
-section .prayer:nth-child(4) { --i: 4; }
-section .prayer:nth-child(5) { --i: 5; }
-section .prayer:nth-child(6) { --i: 6; }
+section .prayer:nth-child(1) {
+  --i: 1;
+}
 
+section .prayer:nth-child(2) {
+  --i: 2;
+}
+
+section .prayer:nth-child(3) {
+  --i: 3;
+}
+
+section .prayer:nth-child(4) {
+  --i: 4;
+}
+
+section .prayer:nth-child(5) {
+  --i: 5;
+}
+
+section .prayer:nth-child(6) {
+  --i: 6;
+}
+
+
+.ayet-container {
+   width: 100%;
+  max-width: 650px;
+  padding: 20px 15px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.ayet-text {
+  font-size: 48px;
+  font-family: 'Scheherazade', 'Amiri', serif; /* Kur’anî yazılar için güzel fontlar */
+  color: #1f2937; 
+  line-height: 1.8;
+}
+
+.ayet-turksh {
+  font-size: 18px;
+  font-family: 'Noto Serif', serif; /* Kur’anî yazılar için güzel fontlar */
+  color: #1f2937; 
+  line-height: 1.8;
+  text-align: center;
+}
+
+.ayet-reference {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #5c342a75; /* açık gri */
+  font-style: italic;
+}

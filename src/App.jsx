@@ -105,11 +105,11 @@ function App() {
       const R = 6371; // Dünya yarıçapı km
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return R * c;
     };
 
@@ -181,17 +181,17 @@ function App() {
 
       try {
         const response = await fetch(`https://api.aladhan.com/v1/calendar?latitude=${selectedCity.latitude}&longitude=${selectedCity.longitude}&method=13&month=${month}&year=${year}`);
-        
+
         if (!response.ok) {
           throw new Error(`API yanıt vermedi: ${response.status}`);
         }
-        
+
         const data_prayer = await response.json();
-        
+
         if (!data_prayer.data || !data_prayer.data[day - 1] || !data_prayer.data[day - 1].timings) {
           throw new Error("API'den geçerli veri alınamadı");
         }
-        
+
         const todayData = data_prayer.data[day - 1].timings;
         setPrayerTimes(todayData);
         setLoading(false);
@@ -275,107 +275,116 @@ function App() {
 
   return (
     <section>
-      <div className="container">
-        {loading ? (
-          <div className="loading">
-            <div className="top_sec">
-              <div className="col">
-                <div className="city">
-                  <h3>Şehir</h3>
-                  <select disabled>
-                    <option>Yükleniyor...</option>
-                  </select>
+      <div className="containers">
+        <div className="container">
+          {loading ? (
+            <div className="loading">
+              <div className="top_sec">
+                <div className="col">
+                  <div className="city">
+                    <h3>Şehir</h3>
+                    <select disabled>
+                      <option>Yükleniyor...</option>
+                    </select>
+                  </div>
+                  <div className="date">
+                    <h3>Tarih</h3>
+                    <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                  </div>
                 </div>
-                <div className="date">
-                  <h3>Tarih</h3>
-                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
-                </div>
-              </div>
-              <div className="info">
-                <h4>{loadingMessage}</h4>
-              </div>
-            </div>
-            
-            <div className="prayer-times">
-              <Prayer name="İmsak" time="--:--" />
-              <Prayer name="Güneş" time="--:--" />
-              <Prayer name="Öğle" time="--:--" />
-              <Prayer name="İkindi" time="--:--" />
-              <Prayer name="Akşam" time="--:--" />
-              <Prayer name="Yatsı" time="--:--" />
-            </div>
-          </div>
-        ) : error ? (
-          <>
-            <div className="top_sec">
-              <div className="col">
-                <div className="city">
-                  <h3>Şehir</h3>
-                  <select 
-                    value={selectedCity?.id || ""} 
-                    onChange={handleCityChange}
-                  >
-                    <option value="">Şehir Seçin</option>
-                    {turkishCities.map((city) => (
-                      <option key={city.id} value={city.id}>{city.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="date">
-                  <h3>Tarih</h3>
-                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                <div className="info">
+                  <h4>{loadingMessage}</h4>
                 </div>
               </div>
-              <div className="info">
-                <h4>{error}</h4>
-              </div>
-            </div>
-            
-            <div className="prayer-times">
-              <Prayer name="İmsak" time="--:--" />
-              <Prayer name="Güneş" time="--:--" />
-              <Prayer name="Öğle" time="--:--" />
-              <Prayer name="İkindi" time="--:--" />
-              <Prayer name="Akşam" time="--:--" />
-              <Prayer name="Yatsı" time="--:--" />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="top_sec">
-              <div className="col">
-                <div className="city">
-                  <h3>Şehir</h3>
-                  <select 
-                    value={selectedCity?.id || ""} 
-                    onChange={handleCityChange}
-                  >
-                    <option value="">Şehir Seçin</option>
-                    {turkishCities.map((city) => (
-                      <option key={city.id} value={city.id}>{city.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="date">
-                  <h3>Tarih</h3>
-                  <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
-                </div>
-              </div>
-              <div className="info">
-                <h4>{nextPrayerInfo}</h4>
-              </div>
-            </div>
 
-            <div className="prayer-times">
-              <Prayer name="İmsak" time={prayerTimes?.Fajr ? String(prayerTimes?.Fajr).split(' ')[0] : ""} />
-              <Prayer name="Güneş" time={prayerTimes?.Sunrise ? String(prayerTimes?.Sunrise).split(' ')[0] : ""} />
-              <Prayer name="Öğle" time={prayerTimes?.Dhuhr ? String(prayerTimes?.Dhuhr).split(' ')[0] : ""} />
-              <Prayer name="İkindi" time={prayerTimes?.Asr ? String(prayerTimes?.Asr).split(' ')[0] : ""} />
-              <Prayer name="Akşam" time={prayerTimes?.Maghrib ? String(prayerTimes?.Maghrib).split(' ')[0] : ""} />
-              <Prayer name="Yatsı" time={prayerTimes?.Isha ? String(prayerTimes?.Isha).split(' ')[0] : ""} />
+              <div className="prayer-times">
+                <Prayer name="İmsak" time="--:--" />
+                <Prayer name="Güneş" time="--:--" />
+                <Prayer name="Öğle" time="--:--" />
+                <Prayer name="İkindi" time="--:--" />
+                <Prayer name="Akşam" time="--:--" />
+                <Prayer name="Yatsı" time="--:--" />
+              </div>
             </div>
-          </>
-        )}
+          ) : error ? (
+            <>
+              <div className="top_sec">
+                <div className="col">
+                  <div className="city">
+                    <h3>Şehir</h3>
+                    <select
+                      value={selectedCity?.id || ""}
+                      onChange={handleCityChange}
+                    >
+                      <option value="">Şehir Seçin</option>
+                      {turkishCities.map((city) => (
+                        <option key={city.id} value={city.id}>{city.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="date">
+                    <h3>Tarih</h3>
+                    <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                  </div>
+                </div>
+                <div className="info">
+                  <h4>{error}</h4>
+                </div>
+              </div>
+
+              <div className="prayer-times">
+                <Prayer name="İmsak" time="--:--" />
+                <Prayer name="Güneş" time="--:--" />
+                <Prayer name="Öğle" time="--:--" />
+                <Prayer name="İkindi" time="--:--" />
+                <Prayer name="Akşam" time="--:--" />
+                <Prayer name="Yatsı" time="--:--" />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="top_sec">
+                <div className="col">
+                  <div className="city">
+                    <h3>Şehir</h3>
+                    <select
+                      value={selectedCity?.id || ""}
+                      onChange={handleCityChange}
+                    >
+                      <option value="">Şehir Seçin</option>
+                      {turkishCities.map((city) => (
+                        <option key={city.id} value={city.id}>{city.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="date">
+                    <h3>Tarih</h3>
+                    <h4>{new Date().toLocaleDateString('tr-TR')}</h4>
+                  </div>
+                </div>
+                <div className="info">
+                  <h4>{nextPrayerInfo}</h4>
+                </div>
+              </div>
+
+              <div className="prayer-times">
+                <Prayer name="İmsak" time={prayerTimes?.Fajr ? String(prayerTimes?.Fajr).split(' ')[0] : ""} />
+                <Prayer name="Güneş" time={prayerTimes?.Sunrise ? String(prayerTimes?.Sunrise).split(' ')[0] : ""} />
+                <Prayer name="Öğle" time={prayerTimes?.Dhuhr ? String(prayerTimes?.Dhuhr).split(' ')[0] : ""} />
+                <Prayer name="İkindi" time={prayerTimes?.Asr ? String(prayerTimes?.Asr).split(' ')[0] : ""} />
+                <Prayer name="Akşam" time={prayerTimes?.Maghrib ? String(prayerTimes?.Maghrib).split(' ')[0] : ""} />
+                <Prayer name="Yatsı" time={prayerTimes?.Isha ? String(prayerTimes?.Isha).split(' ')[0] : ""} />
+              </div>
+            </>
+          )}
+        </div>
+
+    <div class="ayet-container">
+  <p class="ayet-text">﴿ فَذَكِّرْ إِنَّمَا أَنتَ مُذَكِّرٌ ﴾</p>
+  <p class="ayet-turksh">﴿ Öğüt ver, çünkü sen ancak öğüt verensin ﴾</p>
+  <p class="ayet-reference">Gâşiye Suresi, 21</p>
+</div>
+
       </div>
     </section>
   );
