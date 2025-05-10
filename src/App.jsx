@@ -276,6 +276,7 @@ function App() {
 
   return (
     <section>
+      
       <div className="containers">
         <div className="container">
           {loading ? (
@@ -379,11 +380,13 @@ function App() {
             </>
           )}
         </div>
-
-          <Ayet arapca={"قُلْ يَا عِبَادِيَ الَّذ۪ينَ اَسْرَفُوا عَلٰٓى اَنْفُسِهِمْ لَا تَقْنَطُوا مِنْ رَحْمَةِ اللّٰهِۜ اِنَّ اللّٰهَ يَغْفِرُ الذُّنُوبَ جَم۪يعاًۜ اِنَّهُ هُوَ الْغَفُورُ الرَّح۪يمُ"} turkce={"Öğüt ver, çünkü sen ancak öğüt verensin"} reference={"Gâşiye Suresi, 21"} />
-      
+          <Ayet />
+      </div>
+      <div className="app-logo">
+        <img src="src/assets/zikralogo.png" alt="Logo" />
       </div>
     </section>
+    
   );
 }
 

@@ -87,6 +87,7 @@ export default function Ayet() {
 
     return (
         <div className="ayet-container">
+            <p className="ayet-text">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
             <p className="ayet-text">﴿ {arapca} ﴾</p>
             <p className="ayet-turksh">﴿ {turkce} ﴾</p>
             <p className="ayet-reference">{reference}</p>

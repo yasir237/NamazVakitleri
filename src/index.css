@@ -32,6 +32,7 @@ body {
 }
 
 section {
+   position: relative;
   background: url('assets/bg.png');
   background-size: cover;
   background-position: center;
@@ -42,6 +43,19 @@ section {
   padding: 20px;
 }
 
+/* Logo Stillemesi */
+.app-logo {
+ position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1;
+}
+
+.app-logo img {
+  max-width: 80px;
+  height: auto;
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.3));
+}
 section .containers {
   display: flex;
 
@@ -142,6 +156,7 @@ section .prayer {
 
   section .container {
     padding: 15px 10px;
+            margin-bottom: 100px;
   }
 
   section .top_sec {
@@ -169,6 +184,7 @@ section .prayer {
     font-size: 18px;
     margin-bottom: 10px;
   }
+
 }
 
 /* Loading styles */
